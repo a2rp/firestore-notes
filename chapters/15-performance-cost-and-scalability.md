@@ -23,7 +23,31 @@ Check the current pricing for the database edition and location. Pricing, free u
 
 ## Make reads specific and bounded
 
-Use filters, order clauses, and limits that match the screen. Paginate long lists and read documents together through one query when possible instead of issuing a request for each row.
+Use filters, order clauses, and limits that match the screen. Paginate long lists and read documents together through one query when possible instead of issuing a request for each row. This example loads a bounded page for the signed-in user:
+
+~~~js
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+
+const recentTasksQuery = query(
+  collection(db, "tasks"),
+  where("ownerId", "==", currentUser.uid),
+  orderBy("createdAt", "desc"),
+  limit(25)
+);
+
+const snapshot = await getDocs(recentTasksQuery);
+const tasks = snapshot.docs.map((document) => ({
+  id: document.id,
+  ...document.data(),
+}));
+~~~
 
 Choose listeners for data that must update live. Stop them when their screen or user session ends. A listener on a broad, frequently changing collection can create unnecessary reads and network work.
 
